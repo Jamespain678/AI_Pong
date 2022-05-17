@@ -1,6 +1,6 @@
 import pygame
 
-from config import MAX_VEL, WHITE, BALL_RADIUS
+from config import MAX_VEL, WHITE, BALL_RADIUS, WIDTH, HEIGHT
 
 
 class Ball:
@@ -20,3 +20,8 @@ class Ball:
     def move(self) -> None:
         self.x += self.x_vel
         self.y += self.y_vel
+
+    def reset(self) -> None:
+        self.x = WIDTH // 2
+        self.y = HEIGHT // 2
+        self.y_vel = 0

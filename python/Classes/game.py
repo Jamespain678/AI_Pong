@@ -1,8 +1,7 @@
-from turtle import left
 import pygame
 
 from config import PADDLE_HEIGHT, PADDLE_WIDTH, WIDTH, HEIGHT
-from config import FPS, BLACK, WHITE
+from config import FPS, BLACK, WHITE, WINNING_SCORE
 from .paddle import Paddle
 from .ball import Ball
 
@@ -14,9 +13,11 @@ class Game():
         self.run = True
         self.clock = pygame.time.Clock()
         self.left_paddle = Paddle(10,
-                                  HEIGHT//2 - PADDLE_HEIGHT // 2)
+                                  HEIGHT//2 - PADDLE_HEIGHT // 2,
+                                  -1)
         self.right_paddle = Paddle(WIDTH - PADDLE_WIDTH - 10,
-                                   HEIGHT // 2 - PADDLE_HEIGHT // 2)
+                                   HEIGHT // 2 - PADDLE_HEIGHT // 2,
+                                   1)
         self.ball = Ball(WIDTH // 2, HEIGHT // 2)
         self.start()
 
@@ -26,10 +27,13 @@ class Game():
             self.clock.tick(FPS)
             # Draw window
             self.draw()
-            # Events
+        # Events
             self.ball.move()
             self.handle_collisions()
-            if self.ball.x < self.left_paddle.x + self.left_paddle.width or self.ball.x > self.right_paddle.x:
+            self.handle_score()
+            if self.left_paddle.score >= WINNING_SCORE:
+                self.run = False
+            elif self.right_paddle.score >= WINNING_SCORE:
                 self.run = False
             # Close
             for event in pygame.event.get():
@@ -37,7 +41,7 @@ class Game():
                     self.run = False
                     break
             # Keys
-            self.handle_paddle_movement()
+            self.handle_key_inputs()
         pygame.quit()
 
     def draw(self) -> None:
@@ -53,7 +57,7 @@ class Game():
                           HEIGHT))
         pygame.display.update()
 
-    def handle_paddle_movement(self) -> None:
+    def handle_key_inputs(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w] and self.left_paddle.y - self.left_paddle.VEL >= 0:
             self.left_paddle.move(up=True)
@@ -68,23 +72,21 @@ class Game():
         # Borders
         if self.ball.y + self.ball.radius >= HEIGHT or self.ball.y - self.ball.radius <= 0:
             self.ball.y_vel *= -1
-
         # Paddles
         if self.ball.x_vel < 0:
-            if self.ball.y >= self.left_paddle.y:
-                if self.ball.y <= self.left_paddle.y + self.left_paddle.height:
-                    if self.ball.x - self.ball.radius <= self.left_paddle.x + self.left_paddle.width:
-                        self.ball.x_vel *= -1
-                        middle_y = self.left_paddle.y + self.left_paddle.height // 2
-                        difference_y = middle_y - self.ball.y
-                        reduction_factor = (self.left_paddle.height // 2) // self.ball.MAX_VEL
-                        self.ball.y_vel = - difference_y // reduction_factor
+            self.ball.x_vel, self.ball.y_vel = self.left_paddle.ball_colide(self.ball)
         else:
-            if self.ball.y >= self.right_paddle.y:
-                if self.ball.y <= self.right_paddle.y + self.right_paddle.height:
-                    if self.ball.x + self.ball.radius >= self.right_paddle.x:
-                        self.ball.x_vel *= -1
-                        middle_y = self.right_paddle.y + self.right_paddle.height // 2
-                        difference_y = middle_y - self.ball.y
-                        reduction_factor = (self.right_paddle.height // 2) // self.ball.MAX_VEL
-                        self.ball.y_vel = - difference_y // reduction_factor
+            self.ball.x_vel, self.ball.y_vel = self.right_paddle.ball_colide(self.ball)
+
+    def handle_score(self):
+        if self.ball.x < 0:
+            self.right_paddle.score += 1
+            self.reset()
+        elif self.ball.x > WIDTH:
+            self.left_paddle.score += 1
+            self.reset()
+
+    def reset(self):
+        self.ball.reset()
+        self.left_paddle.y = HEIGHT//2 - PADDLE_HEIGHT // 2
+        self.right_paddle.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
