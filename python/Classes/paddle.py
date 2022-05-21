@@ -40,7 +40,7 @@ class Paddle:
             direction = 0
         self.y -= self.VEL*direction
 
-    def ball_colide(self, ball: Ball) -> tuple[int, int]:
+    def ball_colide(self, ball: Ball) -> None:
         y_col = x_col = False
         y_col = self.y < ball.y < self.y + self.height
         if self.side == -1:
@@ -51,5 +51,5 @@ class Paddle:
             middle_y = self.y + self.height // 2
             diff_y = middle_y - ball.y
             y_vel = - (diff_y * ball.MAX_VEL) // (self.height // 2)
-            return ball.x_vel * -1, y_vel
-        return ball.x_vel, ball.y_vel
+            ball.y_vel = y_vel
+            ball.x_vel *= -1

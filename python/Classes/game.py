@@ -106,9 +106,9 @@ class Game():
             self.ball.y_vel *= -1
         # Paddles
         if self.ball.x_vel < 0:
-            self.ball.x_vel, self.ball.y_vel = self.left_paddle.ball_colide(self.ball)
+            self.left_paddle.ball_colide(self.ball)
         else:
-            self.ball.x_vel, self.ball.y_vel = self.right_paddle.ball_colide(self.ball)
+            self.right_paddle.ball_colide(self.ball)
 
     def handle_score(self):
         if self.ball.x < 0:
