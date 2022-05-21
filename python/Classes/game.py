@@ -27,14 +27,10 @@ class Game():
             self.clock.tick(FPS)
             # Draw window
             self.draw()
-        # Events
+            # Events
             self.ball.move()
             self.handle_collisions()
             self.handle_score()
-            if self.left_paddle.score >= WINNING_SCORE:
-                self.run = False
-            elif self.right_paddle.score >= WINNING_SCORE:
-                self.run = False
             # Close
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -85,6 +81,8 @@ class Game():
         elif self.ball.x > WIDTH:
             self.left_paddle.score += 1
             self.reset()
+        if self.right_paddle.score >= WINNING_SCORE or self.left_paddle.score >= WINNING_SCORE:
+            self.run = False
 
     def reset(self):
         self.ball.reset()
