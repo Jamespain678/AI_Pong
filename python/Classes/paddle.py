@@ -1,6 +1,6 @@
 import pygame
 
-from config import WHITE, PADDLE_HEIGHT, PADDLE_WIDTH, VEL, WIDTH
+from config import WHITE, PADDLE_HEIGHT, PADDLE_WIDTH, VEL, WIDTH, HEIGHT
 from .ball import Ball
 
 pygame.init()
@@ -32,11 +32,13 @@ class Paddle:
         score_pos = (WIDTH // 2) + self.side*(WIDTH // 4) - (score_text.get_width()//2)
         win.blit(score_text, (score_pos, 20))
 
-    def move(self, up: bool = True) -> None:
-        if up:
-            self.y -= self.VEL
-        else:
-            self.y += self.VEL
+    def move(self, direction: int = 0) -> None:
+        new_pos = self.y - self.VEL*direction
+        if new_pos <= 0:
+            direction = 0
+        elif new_pos >= HEIGHT - PADDLE_HEIGHT:
+            direction = 0
+        self.y -= self.VEL*direction
 
     def ball_colide(self, ball: Ball) -> tuple[int, int]:
         y_col = x_col = False

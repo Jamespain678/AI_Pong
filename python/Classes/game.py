@@ -44,11 +44,27 @@ class Game():
                     self.run = False
                     break
             # Keys
-            self.handle_key_inputs()
+            self.handle_key_inputs_PvP()
         pygame.quit()
 
     def play_PvAI(self):
-        pass
+        while self.run:
+            # FPS control
+            self.clock.tick(FPS)
+            # Draw window
+            self.draw()
+            # Events
+            self.ball.move()
+            self.handle_collisions()
+            self.handle_score()
+            # Close
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.run = False
+                    break
+            # Keys
+            self.handle_key_inputs_PvAI()
+        pygame.quit()
 
     def play_AIvAI(self):
         pass
@@ -66,16 +82,23 @@ class Game():
                           HEIGHT))
         pygame.display.update()
 
-    def handle_key_inputs(self) -> None:
+    def handle_key_inputs_PvP(self) -> None:
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_w] and self.left_paddle.y - self.left_paddle.VEL >= 0:
-            self.left_paddle.move(up=True)
-        if keys[pygame.K_s] and self.left_paddle.y + self.left_paddle.VEL <= HEIGHT - PADDLE_HEIGHT:
-            self.left_paddle.move(up=False)
-        if keys[pygame.K_i] and self.right_paddle.y - self.right_paddle.VEL >= 0:
-            self.right_paddle.move(up=True)
-        if keys[pygame.K_k] and self.right_paddle.y + self.right_paddle.VEL <= HEIGHT - PADDLE_HEIGHT:
-            self.right_paddle.move(up=False)
+        if keys[pygame.K_w]:
+            self.left_paddle.move(direction=1)
+        if keys[pygame.K_s]:
+            self.left_paddle.move(direction=-1)
+        if keys[pygame.K_i]:
+            self.right_paddle.move(direction=1)
+        if keys[pygame.K_k]:
+            self.right_paddle.move(direction=-1)
+
+    def handle_key_inputs_PvAI(self) -> None:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            self.left_paddle.move(direction=1)
+        if keys[pygame.K_s]:
+            self.left_paddle.move(direction=-1)
 
     def handle_collisions(self):
         # Borders
