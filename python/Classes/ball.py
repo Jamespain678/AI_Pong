@@ -1,3 +1,5 @@
+from random import randint
+
 import pygame
 
 from config import MAX_VEL, WHITE, BALL_RADIUS, WIDTH, HEIGHT
@@ -12,7 +14,7 @@ class Ball:
         self.y = y
         self.radius = BALL_RADIUS
         self.x_vel = self.MAX_VEL
-        self.y_vel = 0
+        self.y_vel = randint(0, self.MAX_VEL)
 
     def draw(self, win) -> None:
         pygame.draw.circle(win, self.COLOR, (self.x, self.y), self.radius)
@@ -24,4 +26,4 @@ class Ball:
     def reset(self) -> None:
         self.x = WIDTH // 2
         self.y = HEIGHT // 2
-        self.y_vel = 0
+        self.y_vel = randint(0, self.MAX_VEL)

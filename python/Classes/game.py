@@ -19,9 +19,16 @@ class Game():
                                    HEIGHT // 2 - PADDLE_HEIGHT // 2,
                                    1)
         self.ball = Ball(WIDTH // 2, HEIGHT // 2)
-        self.start()
 
-    def start(self) -> None:
+    def start(self, mode) -> None:
+        if mode == 0:
+            self.play_PvP()
+        elif mode == 1:
+            self.play_PvAI()
+        elif mode == 2:
+            self.play_AIvAI()
+
+    def play_PvP(self) -> None:
         while self.run:
             # FPS control
             self.clock.tick(FPS)
@@ -39,6 +46,12 @@ class Game():
             # Keys
             self.handle_key_inputs()
         pygame.quit()
+
+    def play_PvAI(self):
+        pass
+
+    def play_AIvAI(self):
+        pass
 
     def draw(self) -> None:
         self.win.fill(BLACK)
