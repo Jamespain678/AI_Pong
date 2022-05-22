@@ -3,7 +3,7 @@ from sys import argv, exit
 from Classes import Game
 
 
-def main():
+def main() -> None:
     if len(argv) < 2:
         exit('Need some arguments [play, train]')
     elif argv[1] == 'play':
