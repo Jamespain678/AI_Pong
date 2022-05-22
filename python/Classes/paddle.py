@@ -1,6 +1,6 @@
 import pygame
 
-from config import WHITE, PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_VEL, WIDTH, HEIGHT
+from config import WHITE, PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_VEL, WIDTH, HEIGHT, MAX_BALL_VEL
 from .ball import Ball
 
 pygame.init()
@@ -65,6 +65,6 @@ class Paddle:
         if y_col and x_col:
             middle_y = self.y + PADDLE_HEIGHT//2
             diff_y = middle_y - ball.y
-            y_vel = - (diff_y * ball.MAX_VEL) // (PADDLE_HEIGHT//2)
+            y_vel = - (diff_y * MAX_BALL_VEL) // (PADDLE_HEIGHT//2)
             ball.y_vel = y_vel
             ball.x_vel *= -1

@@ -9,7 +9,6 @@ def main() -> None:
     elif argv[1] == 'play':
         try:
             modes = {'PvP': 0, 'PvAI': 1, 'AIvAI': 2}
-            print(modes[argv[2]])
             pong = Game()
             pong.start(modes[argv[2]])
         except KeyError:
