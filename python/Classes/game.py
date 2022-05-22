@@ -1,14 +1,17 @@
+import pickle
+
 import pygame
+import neat
 
 from config import PADDLE_HEIGHT, PADDLE_WIDTH, WIDTH, HEIGHT
-from config import FPS, BLACK, WHITE, WINNING_SCORE
+from config import FPS, BLACK, WHITE, WINNING_SCORE, CONFIG_NEAT_PATH
 from .paddle import Paddle
 from .ball import Ball
 
 
 class Game():
     """Class for handle the game"""
-    
+
     def __init__(self) -> None:
         """Init the game"""
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -23,7 +26,7 @@ class Game():
                                    1)
         self.ball = Ball(WIDTH//2, HEIGHT//2)
 
-    def start(self, mode: int) -> None:
+    def play(self, mode: int) -> None:
         """Starts the game
         Args:
             mode (int): Mode (0 PvP, 1 PvAI, 2 AIvAI)
@@ -56,6 +59,12 @@ class Game():
         pygame.quit()
 
     def play_PvAI(self):
+        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                             CONFIG_NEAT_PATH)
+        with open('best.pickle', 'rb') as f:
+            genome = pickle.load(f)
+        self.net2 = neat.nn.FeedForwardNetwork.create(genome, config)
         """Loop fro PvAI game"""
         while self.run:
             # FPS control
@@ -73,10 +82,12 @@ class Game():
                     break
             # Keys
             self.handle_key_inputs_PvAI()
+            out2 = self.net2.activate(self.right_paddle.get_inputs(self.ball))
+            self.right_paddle.move(out2.index(max(out2)) - 1)
         pygame.quit()
 
     def play_AIvAI(self):
-        """Loop fro AIvAI game"""
+        """Loop for AIvAI game"""
         pass
 
     def draw(self) -> None:
@@ -140,3 +151,30 @@ class Game():
         self.ball.reset()
         self.left_paddle.y = HEIGHT//2 - PADDLE_HEIGHT//2
         self.right_paddle.y = HEIGHT//2 - PADDLE_HEIGHT//2
+
+    def train_ai(self, genome1, genome2, config) -> None:
+        net1 = neat.nn.FeedForwardNetwork.create(genome1, config)
+        net2 = neat.nn.FeedForwardNetwork.create(genome2, config)
+        self.run_train = True
+        while self.run_train:
+            # Close
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit(0)
+            out1 = net1.activate(self.left_paddle.get_inputs(self.ball))
+            self.left_paddle.move(out1.index(max(out1)) - 1)
+            out2 = net2.activate(self.right_paddle.get_inputs(self.ball))
+            self.right_paddle.move(out2.index(max(out2)) - 1)
+            # Loop
+            self.ball.move()
+            self.handle_collisions()
+            self.handle_score()
+            # End loop
+            if self.right_paddle.score >= 1 or self.left_paddle.score >= 1 or self.right_paddle.hits >= 50:
+                self.calculate_fitness(genome1, genome2)
+                break
+            # self.draw()
+
+    def calculate_fitness(self, genome1, genome2) -> None:
+        genome1.fitness += self.left_paddle.hits + len(self.left_paddle.movement_score)
+        genome2.fitness += self.right_paddle.hits + len(self.right_paddle.movement_score)

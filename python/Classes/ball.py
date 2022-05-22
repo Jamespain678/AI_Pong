@@ -19,7 +19,7 @@ class Ball:
         self.y = y
         self.radius = BALL_RADIUS
         self.x_vel = choice((-MAX_BALL_VEL, MAX_BALL_VEL))
-        self.y_vel = randint(0, MAX_BALL_VEL)
+        self.y_vel = randint(1, MAX_BALL_VEL)
 
     def draw(self, win: pygame.Surface) -> None:
         """Draw the ball on the window
@@ -38,4 +38,4 @@ class Ball:
         self.x = WIDTH//2
         self.y = HEIGHT//2
         self.x_vel = choice((-MAX_BALL_VEL, MAX_BALL_VEL))
-        self.y_vel = randint(0, MAX_BALL_VEL)
+        self.y_vel = randint(1, MAX_BALL_VEL)

@@ -1,6 +1,7 @@
 import pygame
 
 from config import WHITE, PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_VEL, WIDTH, HEIGHT, MAX_BALL_VEL
+from config import DRAW_HITS
 from .ball import Ball
 
 pygame.init()
@@ -25,6 +26,8 @@ class Paddle:
         self.y = y
         self.side = side
         self.score = 0
+        self.hits = 0
+        self.movement_score = set()
 
     def draw(self, win: pygame.Surface) -> None:
         """Draw the paddle on the window
@@ -34,7 +37,11 @@ class Paddle:
         pygame.draw.rect(win,
                          self.COLOR,
                          (self.x, self.y, PADDLE_WIDTH, PADDLE_HEIGHT))
-        score_text = SCORE_FONT.render(f'{self.score}', 1, WHITE)
+        if DRAW_HITS:
+            text = self.hits
+        else:
+            text = self.score
+        score_text = SCORE_FONT.render(f'{text}', 1, WHITE)
         score_pos = (WIDTH//2) + self.side * (WIDTH//4) - (score_text.get_width()//2)
         win.blit(score_text, (score_pos, 20))
 
@@ -68,3 +75,9 @@ class Paddle:
             y_vel = - (diff_y * MAX_BALL_VEL) // (PADDLE_HEIGHT//2)
             ball.y_vel = y_vel
             ball.x_vel *= -1
+            self.hits += 1
+            self.movement_score.add(diff_y)
+
+    def get_inputs(self, ball: Ball) -> tuple:
+        x_dist = abs(ball.x - self.x)
+        return (self.y, ball.y, x_dist)
